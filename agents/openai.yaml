@@ -1,0 +1,6 @@
+interface:
+  display_name: "SendAfrica Get Started"
+  short_description: "Onboard to SendAfrica API, SDKs, CLI, and Agent MCP with templates and checklists"
+policy:
+  allow_implicit_invocation: false
+  allow_autonomous: false
