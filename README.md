@@ -38,7 +38,7 @@ cd sendafrica-get-started
 |---|---|
 | **REST API** | `curl` examples in `templates/curl/` |
 | **Python SDK** | `pip install sendafrica` — `client.sms.send(...)` |
-| **TypeScript SDK** | `npm install sendafrica` — `await client.sendSms(...)` |
+| **TypeScript SDK** | `npm install sendafrica` — `await client.sms.send(...)` |
 | **Go SDK** | `go get github.com/SendAfrica/GO-SDK` — `client.SMS.Send(ctx, ...)` |
 | **CLI** | `go install github.com/camelt/sendafrica-cli/cmd/sendafrica@latest` |
 | **Agent MCP** | `uv run sendafrica-agent mcp` (stdio) or `/sse` (remote) |

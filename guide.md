@@ -105,11 +105,10 @@ const client = new SendAfricaClient({
   apiKey: process.env.SENDFRICA_API_KEY!,
 });
 
-const result = await client.sendSms({
-  to: "0712345678",
-  message: "Hello from SendAfrica! Your order is ready.",
-  from: "MyBrand",
-});
+const result = await client.sms.send(
+  { to: "0712345678", message: "Hello from SendAfrica! Your order is ready.", from: "MyBrand" },
+  { idempotencyKey: "order-1234" },
+);
 
 console.log(result.messageId, result.status, result.creditsUsed);
 ```

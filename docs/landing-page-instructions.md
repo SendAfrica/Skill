@@ -107,7 +107,7 @@ print(result.message_id, result.status, result.credits_used)
 ```typescript
 import { SendAfricaClient } from "sendafrica";
 const client = new SendAfricaClient({ apiKey: process.env.SENDFRICA_API_KEY! });
-const result = await client.sendSms({ to: "0712345678", message: "Hello from SendAfrica!" });
+const result = await client.sms.send({ to: "0712345678", message: "Hello from SendAfrica!" });
 console.log(result.messageId, result.status, result.creditsUsed);
 ```
 

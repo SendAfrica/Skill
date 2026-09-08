@@ -131,15 +131,15 @@ import { SendAfricaClient, getSmsPartInfo } from "sendafrica";
 
 const client = new SendAfricaClient({ apiKey: process.env.SENDFRICA_API_KEY! });
 
-const result = await client.sendSms(
+const result = await client.sms.send(
   { to: "0712345678", message: "Hello", from: "MyBrand" },
-  { idempotencyKey: "order-1234" }
+  { idempotencyKey: "order-1234" },
 );
 
 const info = getSmsPartInfo("Hello");
 // { encoding: "GSM-7", length: 5, parts: 1, creditsRequired: 1 }
 
-const balance = await client.getBalance();
+const balance = await client.credits.balance();
 ```
 
 Errors: `SendAfricaError` (with `.code`, `.httpStatus`, `.isInsufficientCredits`, `.isRateLimited`, `.isUnauthorized`), `SendAfricaNetworkError`, `InvalidPhoneNumberError`.
