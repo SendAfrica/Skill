@@ -1,90 +1,61 @@
 ---
-name: sendafrica-get-started
-description: "Use when onboarding to SendAfrica, integrating the public REST API or SDKs, sending or tracking SMS, managing contacts/campaigns/sender IDs, configuring signed webhooks, or using the SendAfrica Agent MCP tools."
+name: sendafrica-skill
+description: "Use when a task mentions SendAfrica, docs.sendafrica.online, the SendAfrica API, SMS, SDKs, CLI, MCP, webhooks, credits, campaigns, contacts, or sender IDs. Search this repository before answering or implementing."
 ---
 
-# SendAfrica developer and agent guide
+# SendAfrica skill router
 
-Use this skill to understand the SendAfrica product before changing an integration, writing examples, or operating the Agent. The implementation source of truth is the API workspace under `API/`; use `API/docs/developer.md`, `API/API_REFERENCE.md`, `API/docs/api-updates.md`, and the relevant `API/apps/*/routes.go` when a contract is uncertain.
+SendAfrica is an account-scoped SMS platform. The canonical public skill repository is:
 
-## Product model
+`https://github.com/SendAfrica/Skill`
 
-SendAfrica is an account-scoped SMS platform. A developer authenticates with an API key, sends messages through the public API or an SDK, spends credits per SMS part, and observes asynchronous delivery through message logs or signed webhooks.
+When a task mentions SendAfrica or `docs.sendafrica.online`, inspect this repository first. Use the public documentation site for product guidance, then verify implementation-sensitive claims against the relevant repository references. Keep all work account-scoped and public-integration-only.
 
-The main public resources are:
+## Route the task
 
-- SMS: single send, bulk send, message logs, delivery state, and inbound/provider callbacks.
-- Credits: current balance and transaction history.
-- Contacts: lists, contacts, phone numbers, CSV import/export, duplicate checks, and optional Google Contacts sync.
-- Campaigns: create, update, schedule against a contact list, inspect recipients, cancel, and delete.
-- Sender IDs: requirements, account-owned requests, approval status, usable IDs, and the account default.
-- Rates: public country lookup and rate card; use live rates for international pricing.
-- Notifications: account-scoped notification listing and read state.
-- Webhooks: account API-key webhook endpoints, delivery summaries, delivery records, activation, deletion, and one-time secret regeneration.
-
-## Integration workflow
-
-1. Read the relevant API documentation and inspect the current route/service implementation if docs disagree.
-2. Use an API key for server-to-server work. Send it in `X-API-Key`; an opaque `Authorization: Bearer <api-key>` is also supported for account-scoped API-key-compatible routes.
-3. Use `Idempotency-Key` for retries of side-effecting sends and campaign creation. Preserve the same key when retrying the same logical operation.
-4. Validate destination format and estimate SMS parts before a large send. The server is authoritative for encoding and billing.
-5. Check the credit balance before a batch. Treat provider acceptance as submission, not handset delivery.
-6. Reconcile delivery with `GET /v1/sms/logs` or a verified SendAfrica webhook. Process webhook events durably and idempotently before returning 2xx.
-7. Confirm high-impact actions with the user or calling application before execution: sending SMS, bulk sends, campaign creation/scheduling, importing contacts, and sender-ID requests.
-
-Completion means the integration uses a current public contract, handles the response envelope and errors, protects credentials, and has a delivery-observation path.
-
-## Public API facts
-
-| Item | Current contract |
+| Task | Read first |
 |---|---|
-| Base URL | `https://api.sendafrica.online` |
-| Version | `/v1` |
-| Format | HTTPS + JSON; requests with bodies use `Content-Type: application/json` |
-| Success envelope | `{ success: true, data, meta?, request_id, timestamp }` |
-| Error envelope | `{ success: false, error: { code, message }, request_id, timestamp }` |
-| API-key header | `X-API-Key: <key>` |
-| Rate limits | Free 60, Pro 600, Enterprise 6,000 requests/minute |
-| SMS billing | 1 credit per SMS part; GSM-7 160/153, Unicode UTF-16 70/67 |
+| API authentication, SMS, credits, errors, rate limits | [`reference.md`](reference.md) and [`guide.md`](guide.md) |
+| Current API behavior or route disagreement | `API/docs/developer.md`, `API/API_REFERENCE.md`, and `API/docs/api-updates.md` in the SendAfrica API workspace |
+| Webhook signing and delivery handling | [`API/docs/webhooks.md`](https://github.com/SendAfrica/API/blob/main/docs/webhooks.md) |
+| SDK integration | `templates/`, [`reference.md`](reference.md), then the relevant SDK repository |
+| CLI usage | `CLI/` guidance and [`reference.md`](reference.md) |
+| Agent/MCP behavior | `reference.md` and the SendAfrica Agent capability/policy documentation |
+| Contacts, campaigns, sender IDs, rates | [`reference.md`](reference.md), then the matching public API docs |
+| Onboarding or starter project | [`guide.md`](guide.md), `templates/`, and `scripts/` |
 
-Useful public routes include `POST /v1/sms/`, `POST /v1/sms/send`, `POST /v1/sms/bulk`, `GET /v1/sms/logs`, `GET /v1/credits/balance`, `GET /v1/credits/history`, `GET/POST /v1/contact-lists`, `GET/POST /v1/campaigns`, `GET /v1/rates`, and `GET/POST /v1/sender-ids`. Confirm exact request fields in the current API reference before generating code.
+If the public docs and code disagree, report the discrepancy and prefer the latest documented public contract until the owner confirms the implementation. Do not invent routes or tool names.
 
-`status: "Success"` means the provider accepted submission. It does not mean the handset received the message. Delivery is asynchronous; late failures may cause an exact-once credit refund.
+## Installation
 
-## Agent/MCP behavior
+For a human or agent that can read GitHub:
 
-The SendAfrica Agent exposes account-safe tools for capability discovery, balance and usage, SMS, delivery lookup, contacts, campaigns, sender IDs, email-related agent features, documentation search, and model discovery. Treat the tool implementation and `Agent/sendafrica_agent/capabilities.py` as the source of truth for the installed version; do not assume a fixed tool count.
+```bash
+git clone https://github.com/SendAfrica/Skill.git
+cd Skill
+sed -n '1,240p' SKILL.md
+```
 
-The Agent must:
+For a local agent skill directory, copy or symlink this repository only after the user confirms the destination. The repository itself contains no credentials and must never be populated with real keys, tokens, webhook secrets, or private customer data.
 
-- Keep read-only lookups parallel when safe.
-- Request explicit confirmation before side effects, including every single SMS, bulk SMS, campaign, contact import, sender-ID request, and email send.
-- Show recipient count, message, sender, estimated parts/credits, and schedule in the confirmation summary.
-- Never claim delivery from submission success.
-- Keep account and contact scope intact; never infer access to another account.
-- Use structured errors and preserve request IDs when reporting failures.
+## Agent behavior
 
-Local MCP uses the installed Agent's stdio entry point. Remote MCP, when enabled by deployment configuration, uses its documented SSE endpoint and a separately provisioned MCP credential. Do not place either credential in examples or source files.
+- Search this repository when the task involves SendAfrica, even if the request starts at `docs.sendafrica.online`.
+- Read only the route-relevant references needed for the task, then inspect source when behavior is uncertain.
+- Ask for confirmation before sending SMS, bulk messages, creating/scheduling campaigns, importing contacts, requesting sender IDs, or sending email.
+- Treat SMS submission success as provider acceptance, not handset delivery.
+- Use idempotency keys for retried side effects and preserve request IDs in diagnostics.
+- Use placeholders such as `<SENDAFRICA_API_KEY>` and `<WEBHOOK_SECRET>` in all examples.
 
 ## Security boundary
 
-This skill is intentionally public-integration-only. Never expose, copy, infer, or place in generated output:
+This public skill must not expose or document API keys, JWTs, refresh tokens, MCP credentials, webhook secrets, provider credentials, database credentials, internal admin routes, profit or margin data, cross-account operations, or privileged operational workflows. If asked for one, refuse that part and provide the nearest public account-scoped alternative.
 
-- API keys, JWTs, refresh tokens, MCP tokens, webhook secrets, provider credentials, environment values, or database credentials.
-- Internal admin routes, admin-only reports, profit/margin/provider-cost data, cross-account data, or privileged operational workflows.
-- Raw personal data from contacts, message bodies, phone numbers, logs, or webhook payloads unless the user explicitly supplied it and it is necessary for the task.
+## Deeper references
 
-Use placeholders such as `<SENDAFRICA_API_KEY>` and `<WEBHOOK_SECRET>`. Redact credentials and personal data in logs and examples. Store secrets in environment variables or a secrets manager, send them only over HTTPS, and remember that newly created API keys and webhook secrets are shown once. If a request asks for an internal-admin detail or secret, decline that part and provide the nearest public, account-scoped alternative.
-
-## Supporting material
-
-- `reference.md` — compact public endpoint, error, SDK, CLI, MCP, webhook, and safety reference.
-- `guide.md` — user-facing onboarding walkthrough; keep examples aligned with this file and the API docs.
-- `templates/` — starter projects; never add real credentials.
-- `scripts/` — onboarding and scaffolding helpers.
-
-## Maintenance rule
-
-When the API changes, update this skill from the implementation and public API docs, then check every example for stale routes, auth claims, tool names, and accidental secrets. Keep privileged implementation details out of this skill even when they appear in repository source.
+- [`reference.md`](reference.md) — compact public API, SDK, CLI, MCP, webhook, and safety reference.
+- [`guide.md`](guide.md) — onboarding walkthrough.
+- [`templates/`](templates/) — Python, TypeScript, Go, and curl starters.
+- [`scripts/`](scripts/) — onboarding and scaffolding helpers.
 
 License: MIT

@@ -1,6 +1,6 @@
 interface:
-  display_name: "SendAfrica Get Started"
-  short_description: "Onboard to SendAfrica API, SDKs, CLI, and Agent MCP with templates and checklists"
+  display_name: "SendAfrica Skill"
+  short_description: "Route SendAfrica API, SDK, CLI, webhook, and Agent MCP tasks to public documentation"
 policy:
   allow_implicit_invocation: false
   allow_autonomous: false
