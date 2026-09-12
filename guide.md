@@ -60,7 +60,7 @@ curl -X POST https://api.sendafrica.online/v1/sms/ \
 {
   "success": true,
   "data": {
-    "message_id": "SA-f3b1c2d49e8a4f2bb1c2d3e4f5a6b7c8",
+    "message_id": "<MESSAGE_ID>",
     "status": "Success",
     "cost": "TZS 35.00",
     "credits_used": 1
@@ -267,8 +267,7 @@ Add to your MCP client configuration (e.g., Claude Desktop `claude_desktop_confi
       "command": "uv",
       "args": ["run", "--directory", "/path/to/SendAfrica-Agent", "sendafrica-agent", "mcp"],
       "env": {
-        "SENDAFRICA_API_KEY": "SA-your-key-here",
-        "MAILAFRICA_API_KEY": "MA-your-key-here"
+        "SENDAFRICA_API_KEY": "<SENDAFRICA_API_KEY>"
       }
     }
   }

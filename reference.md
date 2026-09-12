@@ -44,7 +44,7 @@ curl -H "Authorization: Bearer $JWT_TOKEN" https://api.sendafrica.online/v1/sms/
 | **Logout, password change** | ❌ | ✅ only |
 | **Email/phone verification** | ❌ | ✅ only |
 | **API key management** | ❌ | ✅ only |
-| **Admin routes** (`/v1/admin/*`) | ❌ | ✅ (`is_admin = true`) |
+| Privileged platform operations | Not part of this public skill | Not part of this public skill |
 | **Sandbox** | ✅ | ❌ |
 
 ## Error codes
@@ -253,8 +253,7 @@ The SendAfrica Agent (`sendafrica-agent`) exposes these FastMCP tools:
       "command": "uv",
       "args": ["run", "--directory", "/path/to/SendAfrica-Agent", "sendafrica-agent", "mcp"],
       "env": {
-        "SENDAFRICA_API_KEY": "SA-your-key-here",
-        "MAILAFRICA_API_KEY": "MA-your-key-here"
+        "SENDAFRICA_API_KEY": "<SENDAFRICA_API_KEY>"
       }
     }
   }
@@ -263,8 +262,7 @@ The SendAfrica Agent (`sendafrica-agent`) exposes these FastMCP tools:
 
 **Remote SSE:**
 - URL: `https://agent.sendafrica.online/sse`
-- Auth: `Authorization: Bearer <AGENT_MCP_AUTH_TOKEN>` or `X-MCP-Token`
-- Token is separate from account API keys; fails closed (503) if not configured
+- Auth is deployment-configured; never put an MCP credential in source, logs, or examples.
 
 ## Sandbox
 
@@ -287,5 +285,5 @@ Terminal transitions are monotonic; conflicting callbacks are ignored with `Sand
 - **Submission ≠ delivery**: `status: "Success"` means provider accepted, not handset-delivered. Read message logs.
 - **Sender IDs are free but must be approved**: Omit `from` to use platform default `SENDAFRICA`. Custom names via `POST /v1/sender-ids`, wait for `approved` status.
 - **SMS `Success` is per-submission**: Provider delivery failures still consume credits. The platform automatically refunds on gateway failure.
-- **Never commit API keys to source**: Load from environment variables or a secrets manager.
+- **Credential safety**: Use placeholders in examples and load keys/secrets from environment variables or a secrets manager. Keep privileged platform routes and internal accounting outside this public reference.
 - **Sandbox for everything**: Use sandbox endpoints for integration tests, CI, and dashboard prototyping — zero provider calls, zero credit deductions.
